@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <meta charset="UTF-8">
+        <title>{% block title %}My account{% endblock title %}</title>
+        <link rel="stylesheet" href="/assets/css/style.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+
+         {%  block specifiy %}
+                {% if login %}
+                    <button class="signout" type="submit"><a href="/signout">Sign out</a></button>
+                    <h1>My account</h1>
+                    <ul class="nav nav-tabs">
+                        <li role="presentation"><a href="/novosporocilo">Novo sporocilo</a></li>
+                        <li role="presentation"><a href="/prejeto">Prejeto</a></li>
+                        <li role="presentation"><a href="/poslano">Poslano</a></li>
+                        <li role="presentation"><a href="/vreme">Vreme</a></li>
+                    </ul>
+                {% else %}
+                        Če želiš uporabljati BBmail se prosim <a href="/signin">logiraj tu</a>. Če uporabniškega računa še nimaš,
+                        se <a href="/registration">registriraj</a>.
+                {% endif %}
+
+         {% endblock specifiy %}
+
+        </div>
+    </body>
+</html>

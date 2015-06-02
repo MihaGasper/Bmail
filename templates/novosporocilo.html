@@ -1,0 +1,28 @@
+{% extends "hello.html" %}
+
+{% block title %}New message{% endblock title %}
+
+{% block specifiy %}
+    {% if login %}
+        <button class="signout" type="submit"><a href="/signout">Sign out</a></button>
+        <h1>My account</h1>
+            <ul class="nav nav-tabs">
+                <li role="presentation" class="active"><a href="/novosporocilo">Novo sporocilo</a></li>
+                <li role="presentation"><a href="/prejeto">Prejeto</a></li>
+                <li role="presentation"><a href="/poslano">Poslano</a></li>
+                <li role="presentation"><a href="/vreme">Vreme</a></li>
+            </ul>
+        <form action="/rezultat" method="post">
+            <input class="inputs" name="receiver" placeholder="Email"></br>
+            <input class="inputs" name="name1" placeholder="Naslov"></br>
+            <textarea class="inputs1" name="body" placeholder="Sporocilo"></textarea></br>
+            <button type="submit">Poslji</button>
+        </form>
+
+    {% else %}
+        Če želiš uporabljati Bmail se prosim <a href="/signin">logiraj tu</a>. Če uporabniškega računa še nimaš, se <a href="/registration">registriraj</a>.
+    {% endif %}
+
+
+
+{% endblock specifiy %}
