@@ -130,7 +130,6 @@ class SigninHandler(BaseHandler):
 class SignoutHandler(BaseHandler):
 
     def get(self):
-        self.response.set_cookie("uid")
         self.response.delete_cookie("uid")
         self.redirect_to("signin")
 
