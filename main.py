@@ -51,9 +51,9 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.set_cookie(key="uid", value=vrednost, expires=expires)
 
     def checkcookie(self, cookie_vrednost):
+
         if cookie_vrednost == "empty":
-            self.redirect_to("signin")
-            return
+            return False
 
         else:
             user_id, code, expires_ts = cookie_vrednost.split(":")
@@ -139,17 +139,21 @@ class SignoutHandler(BaseHandler):
         self.request.cookies.get("uid")
         expires = datetime.datetime.utcnow()
         self.response.set_cookie(key="uid", value="empty", expires=expires)
+        self.redirect_to("signin")
 
 class PoslanoHandler(BaseHandler):
 
     def get(self):
         cookie_value = self.request.cookies.get("uid")
         if self.checkcookie(cookie_vrednost=cookie_value):
+
             user_id, code, expires_ts = cookie_value.split(":")
             user = User.get_by_id(int(user_id))
             list = Message.query(Message.sender==user.email).fetch()
             params = {"list": list, "user":user}
             self.render_template("poslano.html", params=params)
+        else:
+            self.redirect_to("signin")
 
 class PosameznoposlanosporociloHandler(BaseHandler):
 
@@ -174,7 +178,10 @@ class PrejetoHandler(BaseHandler):
             user = User.get_by_id(int(user_id))
             list = Message.query(Message.receiver==user.email).fetch()
             params = {"list": list, "user": user}
-        self.render_template("prejeto.html", params=params)
+            self.render_template("prejeto.html", params=params)
+
+        else:
+            self.redirect_to("signin")
 
 class NovosporociloHandler(BaseHandler):
 
