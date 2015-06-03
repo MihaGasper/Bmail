@@ -51,17 +51,23 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.set_cookie(key="uid", value=vrednost, expires=expires)
 
     def checkcookie(self, cookie_vrednost):
-        user_id, code, expires_ts = cookie_vrednost.split(":")
+        if cookie_vrednost == "empty":
+            self.redirect_to("signin")
+            return
 
-        if datetime.datetime.utcfromtimestamp(float(expires_ts)) > datetime.datetime.now():
-            check = hmac.new(str(user_id), str(secret) + str(expires_ts), hashlib.sha1).hexdigest()
+        else:
+            user_id, code, expires_ts = cookie_vrednost.split(":")
+            if datetime.datetime.utcfromtimestamp(float(expires_ts)) > datetime.datetime.now():
+                check = hmac.new(str(user_id), str(secret) + str(expires_ts), hashlib.sha1).hexdigest()
 
-            if code == check:
-                return True
+                if code == check:
+                    return True
+                else:
+                    self.redirect_to("signin")
+                    return
+
             else:
                 return False
-        else:
-            return False
 
     def render_template(self, view_filename, params=None):
         if not params:
@@ -130,8 +136,9 @@ class SigninHandler(BaseHandler):
 class SignoutHandler(BaseHandler):
 
     def get(self):
-        self.response.delete_cookie("uid")
-        self.redirect_to("signin")
+        self.request.cookies.get("uid")
+        expires = datetime.datetime.utcnow()
+        self.response.set_cookie(key="uid", value="empty", expires=expires)
 
 class PoslanoHandler(BaseHandler):
 
