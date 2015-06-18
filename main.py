@@ -8,9 +8,11 @@ import hmac
 import datetime
 from secret import secret
 import time
-from models import Message
+import random
+
 from google.appengine.api import urlfetch
 import json
+
 
 template_dir = os.path.join(os.path.dirname(__file__), "templates")
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir), autoescape=False)
@@ -123,7 +125,7 @@ class SigninHandler(BaseHandler):
     def post(self):
         email = self.request.get("email")
         password = self.request.get("password")
-
+                    
         user = User.query(User.email == email).get()
 
         if User.check_password(original_password=password, user=user):
@@ -141,90 +143,51 @@ class SignoutHandler(BaseHandler):
         self.response.set_cookie(key="uid", value="empty", expires=expires)
         self.redirect_to("signin")
 
-class PoslanoHandler(BaseHandler):
+
+class KdosemHandler(BaseHandler):
 
     def get(self):
-        cookie_value = self.request.cookies.get("uid")
-        if self.checkcookie(cookie_vrednost=cookie_value):
+        user = User.query().get()
+        params = {"user": user}
+        self.render_template("kdosem.html", params)
 
-            user_id, code, expires_ts = cookie_value.split(":")
-            user = User.get_by_id(int(user_id))
-            list = Message.query(Message.sender==user.email).fetch()
-            params = {"list": list, "user":user}
-            self.render_template("poslano.html", params=params)
-        else:
-            self.redirect_to("signin")
-
-class PosameznoposlanosporociloHandler(BaseHandler):
-
-    def get(self, message_id):
-            message = Message.get_by_id(int(message_id))
-            params = {"message": message}
-            self.render_template("poslanosporocilo.html", params=params)
-
-class PosameznoprejetosporociloHandler(BaseHandler):
-
-    def get(self, message_id):
-            message = Message.get_by_id(int(message_id))
-            params = {"message": message}
-            self.render_template("prejetosporocilo.html", params=params)
-
-class PrejetoHandler(BaseHandler):
+class UraHandler(BaseHandler):
 
     def get(self):
-        cookie_value = self.request.cookies.get("uid")
-        if self.checkcookie(cookie_vrednost=cookie_value):
-            user_id, code, expires_ts = cookie_value.split(":")
-            user = User.get_by_id(int(user_id))
-            list = Message.query(Message.receiver==user.email).fetch()
-            params = {"list": list, "user": user}
-            self.render_template("prejeto.html", params=params)
-
-        else:
-            self.redirect_to("signin")
-
-class NovosporociloHandler(BaseHandler):
-
-    def get(self):
-        self.render_template("novosporocilo.html")
-
-class RezultatHandler(BaseHandler):
-
-    def post(self):
-        cookie_value = self.request.cookies.get("uid")
-        if self.checkcookie(cookie_vrednost=cookie_value):
-            user_id, code, expires_ts = cookie_value.split(":")
-            sender = User.get_by_id(int(user_id))
-            receiver = self.request.get("receiver")
-            name1 = self.request.get("name1")
-            body = self.request.get("body")
-
-        Message.createmessage(name1=name1, body=body, sender=sender.email, receiver=receiver)
-
-        self.render_template("novosporocilo.html")
-        self.write("Sporocilo poslano")
-
-class WeatherHandler(BaseHandler):
-
-    def get(self):
-        url = "http://api.openweathermap.org/data/2.5/weather?q=Kamnik,si&units=metric"
+        user = User.query().get()
+        url = "https://script.googleusercontent.com/macros/echo?user_content_key=fG8dZvZ_Q4j4Dax5lS3YNDHBbNkRoqqFZe9cdu0HqJOkgcUXGKnCzBV8Js4T3uCs6rqXQRkXcZo7vCSIotZHBs-FDYLjcOhxm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnJ9GRkcRevgjTvo8Dc32iw_BLJPcPfRdVKhJT5HNzQuXEeN3QFwl2n0M6ZmO-h7C6bwVq0tbM60-YSRgvERRRx-Tfxfwq6gY2Rp2qpLh6fRh&lib=MwxUjRcLr2qLlnVOLh12wSNkqcO1Ikdrk"
         result = urlfetch.fetch(url)
         podatki = json.loads(result.content)
-        params = {"podatki": podatki}
-        self.render_template("vreme.html", params)
+        params = {"podatki": podatki,"user": user}
+        self.render_template("ura.html", params)
 
+class LokacijaHandler(BaseHandler):
+
+    def get(self):
+
+        user = User.query().get()
+        url = "http://www.telize.com/geoip"
+        result = urlfetch.fetch(url)
+        podatki2 = json.loads(result.content)
+        params = {"podatki2": podatki2,"user": user}
+        self.render_template("lokacija.html", params)
+
+class PocutjeHandler(BaseHandler):
+
+    def get(self):
+        pocutje = ["super", "dobro", "slabo"]
+        trenutno = random.choice(pocutje)
+        params = {"trenutno": trenutno}
+        self.render_template("kakosem.html", params)
 
 app = webapp2.WSGIApplication([
     webapp2.Route('/', MainHandler, name="main"),
     webapp2.Route('/registration', CreateAccountHandler, name="registration"),
     webapp2.Route('/signin', SigninHandler, name="signin"),
-    webapp2.Route('/rezultat', RezultatHandler),
+    webapp2.Route('/kdosem', KdosemHandler),
     webapp2.Route('/signout', SignoutHandler),
-    webapp2.Route('/poslano', PoslanoHandler),
-    webapp2.Route('/poslano/<message_id:\d+>', PosameznoposlanosporociloHandler),
-    webapp2.Route('/prejeto/<message_id:\d+>', PosameznoprejetosporociloHandler),
-    webapp2.Route('/prejeto', PrejetoHandler),
-    webapp2.Route('/novosporocilo', NovosporociloHandler, name="novosporocilo"),
-    webapp2.Route('/vreme', WeatherHandler),
+    webapp2.Route('/ura', UraHandler),
+    webapp2.Route('/lokacija', LokacijaHandler),
+    webapp2.Route('/kakosem', PocutjeHandler),
 
 ], debug=True)

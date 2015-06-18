@@ -1,0 +1,22 @@
+{% extends "hello.html" %}
+
+{% block title %}Lokacija{% endblock title %}
+
+{% block specifiy %}
+
+    {% if login %}
+                <a href="/signout"><button class="signout" type="submit">Sign out</button></a>
+                <a href="/"><button  type="submit">Domov</button></a>
+                </br>
+                <h3>Uporabnik {{ user.name }} {{ user.surname }} tvoja lokacija je:
+
+                    mesto {{ podatki2.city }},
+                    drzava {{ podatki2.country}}
+
+                </h3>
+
+    {% else %}
+        Ce zelis uporabljati Zabec.net se prosim <a href="/signin">logiraj tu</a>. Ce uporabniskega racuna se nimas, se <a href="/registration">registriraj</a>.
+    {% endif %}
+
+{% endblock specifiy %}

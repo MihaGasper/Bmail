@@ -1,0 +1,18 @@
+{% extends "hello.html" %}
+
+{% block title %}Ura{% endblock title %}
+
+{% block specifiy %}
+
+    {% if login %}
+                <a href="/signout"><button class="signout" type="submit">Sign out</button></a>
+                <a href="/"><button  type="submit">Domov</button></a>
+                </br>
+                <h3>{{ user.name }} {{ user.surname }} ura je {{ podatki.fulldate[16:25] }}</h3>
+
+             
+    {% else %}
+        Ce zelis uporabljati Zabec.net se prosim <a href="/signin">logiraj tu</a>. Ce uporabniskega racuna se nimas, se <a href="/registration">registriraj</a>.
+    {% endif %}
+
+{% endblock specifiy %}

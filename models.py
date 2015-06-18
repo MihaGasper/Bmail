@@ -4,6 +4,7 @@ import uuid
 from google.appengine.ext import ndb
 
 
+
 class User(ndb.Model):
     name = ndb.StringProperty()
     surname = ndb.StringProperty()
@@ -32,15 +33,7 @@ class User(ndb.Model):
         else:
             return False
 
-class Message(ndb.Model):
 
-    sender = ndb.StringProperty()
-    receiver = ndb.StringProperty()
-    name1 = ndb.StringProperty()
-    body = ndb.TextProperty()
-    created = ndb.DateProperty(auto_now_add=True)
 
-    @classmethod
-    def createmessage(cls, name1, body, sender, receiver):
-        message = cls(name1=name1, body=body, sender=sender, receiver=receiver)
-        message.put()
+
+
